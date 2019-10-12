@@ -1,0 +1,26 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "contact",
+    "type": "object",
+    "properties": {
+        "contactName": {
+            "type": "string"
+        },
+        "contactNumber": {
+            "type": "string"
+        },
+        "contactEmail": {
+            "type": "string"
+        },
+        "contactGroup": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "contactName",
+        "contactNumber",
+        "contactEmail",
+        "contactGroup"
+    ],
+    "additionalProperties": false
+}

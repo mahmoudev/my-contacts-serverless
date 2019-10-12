@@ -1,0 +1,207 @@
+service:
+  name: serverless-contacts-app
+
+plugins:
+  - serverless-webpack
+  - serverless-iam-roles-per-function
+  - serverless-reqvalidator-plugin
+  - serverless-aws-documentation
+  - serverless-plugin-tracing
+
+packages:
+  individually: true
+
+provider:
+  tracing:
+    lambda: true
+    apiGateway: true
+
+  name: aws
+  runtime: nodejs8.10
+
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'us-west-2'}
+
+  environment:
+    CONTACTS_TABLE: MyContacts-${self:provider.stage}
+    CONTACT_ID_INDEX: ContactIdIndex
+    IMAGES_S3_BUCKET: serverless-my-contact-images-${self:provider.stage}
+    SIGNED_URL_EXPIRATION: 300
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - s3:PutObject
+        - s3:GetObject  
+      Resource: arn:aws:s3:::${self:provider.environment.IMAGES_S3_BUCKET}/*
+    - Effect: "Allow" # xray permissions (required)
+      Action:
+        - "xray:PutTraceSegments"
+        - "xray:PutTelemetryRecords"
+      Resource:
+        - "*"
+
+
+custom:
+  documentation:
+    api:
+      info:
+        version: v1.0.0
+        title: My Contacts API
+        description: Serverless application for my contacts
+    models:
+      - name: CreateContactItemRequest
+        contentType: application/json
+        schema: ${file(models/create-contact-request.json)}
+      - name: UpdateContactItemRequest
+        contentType: application/json
+        schema: ${file(models/update-contact-request.json)}
+
+functions:
+  Auth:
+    handler: src/lambda/auth/auth0Authorizer.handler
+
+  GetContacts:
+    handler: src/lambda/http/getContacts.handler
+    events:
+      - http:
+          method: get
+          path: contacts
+          cors: true
+          authorizer: Auth
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.CONTACTS_TABLE}
+
+  CreateContact:
+    handler: src/lambda/http/createContact.handler
+    events:
+      - http:
+          method: post
+          path: contacts
+          cors: true
+          authorizer: Auth
+          reqValidatorName: RequestBodyValidator
+          documentation:
+            summery: Create a new contact item
+            description: Create a new contact item
+            requestModels:
+              'application/json': CreateContactItemRequest
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:PutItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.CONTACTS_TABLE}
+
+  UpdateContact:
+    handler: src/lambda/http/updateContact.handler
+    events:
+      - http:
+          method: patch
+          path: contacts/{contactId}
+          cors: true
+          authorizer: Auth
+          reqValidatorName: RequestBodyValidator
+          documentation:
+            summery: Create a new contact item
+            description: Create a new contact item
+            requestModels:
+              'application/json': UpdateContactItemRequest
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:UpdateItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.CONTACTS_TABLE}
+
+  DeleteContact:
+    handler: src/lambda/http/deleteContact.handler
+    events:
+      - http:
+          method: delete
+          path: contacts/{contactId}
+          cors: true
+          authorizer: Auth
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:DeleteItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.CONTACTS_TABLE}
+
+  GenerateUploadUrl:
+    handler: src/lambda/http/generateUploadUrl.handler
+    events:
+      - http:
+          method: post
+          path: contacts/{contactId}/contactImage
+          cors: true
+          authorizer: Auth
+
+resources:
+  Resources:
+    GatewayResponseDefault4XX:
+      Type: AWS::ApiGateway::GatewayResponse
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+          gatewayresponse.header.Access-Control-Allow-Methods: "'GET,OPTIONS,POST'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: ApiGatewayRestApi
+
+    RequestBodyValidator:
+      Type: AWS::ApiGateway::RequestValidator
+      Properties:
+        Name: 'request-body-validator'
+        RestApiId:
+          Ref: ApiGatewayRestApi
+        ValidateRequestBody: true
+        ValidateRequestParameters: false
+
+    ContactsDynamoDBTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: contactId
+            AttributeType: S
+          - AttributeName: createdAt
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId #partition key
+            KeyType: HASH
+          - AttributeName: contactId # sort key
+            KeyType: RANGE
+        LocalSecondaryIndexes:
+          - IndexName: ${self:provider.environment.CONTACT_ID_INDEX}
+            KeySchema:
+              - AttributeName: userId
+                KeyType: HASH
+              - AttributeName: createdAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL # What attributes will be copied to an index
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:provider.environment.CONTACTS_TABLE}
+    ImagesBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.IMAGES_S3_BUCKET}
+        CorsConfiguration:
+          CorsRules:
+            -
+              AllowedOrigins:
+                - '*'
+              AllowedHeaders:
+                - '*'
+              AllowedMethods:
+                - GET
+                - PUT
+                - POST
+                - DELETE
+                - HEAD
+              MaxAge: 3000
+      

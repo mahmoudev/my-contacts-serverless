@@ -1,0 +1,243 @@
+{
+	"info": {
+		"_postman_id": "76f0433a-e90f-48ae-8969-8363fff0e389",
+		"name": "My Contacts",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create new contact",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"contactName\": \"mahmoud 9\",\n\t\"contactNumber\": \"99999999\",\n\t\"contactEmail\": \"m@m.com\",\n\t\"contactGroup\": \"work\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{api_id}}.execute-api.us-west-2.amazonaws.com/dev/contacts",
+					"protocol": "https",
+					"host": [
+						"{{api_id}}",
+						"execute-api",
+						"us-west-2",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"dev",
+						"contacts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get my contacts",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://{{api_id}}.execute-api.us-west-2.amazonaws.com/dev/contacts",
+					"protocol": "https",
+					"host": [
+						"{{api_id}}",
+						"execute-api",
+						"us-west-2",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"dev",
+						"contacts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update contact",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"contactName\": \"mahmoud 4\",\n\t\"contactNumber\": \"777788\",\n\t\"contactEmail\": \"m@m.com\",\n\t\"contactGroup\": \"work\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{api_id}}.execute-api.us-west-2.amazonaws.com/dev/contacts/{{contact_id_update}}",
+					"protocol": "https",
+					"host": [
+						"{{api_id}}",
+						"execute-api",
+						"us-west-2",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"dev",
+						"contacts",
+						"{{contact_id_update}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete contact",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://{{api_id}}.execute-api.us-west-2.amazonaws.com/dev/contacts/{{contact_id_delete}}",
+					"protocol": "https",
+					"host": [
+						"{{api_id}}",
+						"execute-api",
+						"us-west-2",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"dev",
+						"contacts",
+						"{{contact_id_delete}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get contat image URL",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "https://{{api_id}}.execute-api.us-west-2.amazonaws.com/dev/contacts/30e0c1b7-b0b2-4b10-87b7-3501a2d88c5f/contactImage",
+					"protocol": "https",
+					"host": [
+						"{{api_id}}",
+						"execute-api",
+						"us-west-2",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"dev",
+						"contacts",
+						"30e0c1b7-b0b2-4b10-87b7-3501a2d88c5f",
+						"contactImage"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "bd75eaee-9ebe-4ea2-aaed-94abd7ae81f4",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "3df94e21-40af-47c7-901f-0f75869349eb",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "1e74d06e-63ce-45d6-b307-6b30f1437bd2",
+			"key": "token",
+			"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Ik1ERkNRVGsxTnprM09ETTROell5T0RsR01UY3pRMFF5TTBSRk5EaEJNa1F3T1VJek5VWTJSQSJ9.eyJpc3MiOiJodHRwczovL21haG1vdWRldi5hdXRoMC5jb20vIiwic3ViIjoiZ29vZ2xlLW9hdXRoMnwxMTMxODcxMzA4ODg1OTkyODQ3MTgiLCJhdWQiOiJrZHBUcFBCWFd1Z2Q0OWZLVVN4czdtNWV3dlZ1Yjh1eiIsImlhdCI6MTU3MDg2OTIwNywiZXhwIjoxNTcwOTA1MjA4LCJhdF9oYXNoIjoiSk1pd0VlV3VnTWdaeENXNjlBMGc3ZyIsIm5vbmNlIjoicGRrTHlDaUFOVmtxOVJJeVZQRVUzU29LZERhc3R1OXQifQ.dvrqoY-Mw6eJZ3qgaKzAxFZb3mxJzZZbmZStlurjlHP6qxfDRNQ3WCChewsgVzdV-pBY1MCOxi3SF3RvALSFzLxg-SJT_-_Z2q812_Te3esjYf5lCEwJuj7Xc_a9qhLNvPKRz3xsE-5IWpB1wBCignt93PR8fTe8oerRxvuqOpWKuQ2WOnzdH_pI8dsvLkuT7yg1wCubfUuwCl76hxoV7UtLpUXdwSDSsYAH4b5FMm7wRWHmy-GmzbKkghDiZ8QoCDhACaQsinsz1x0_zC9c_Q8o2x7Zx-BFEWsPtI-T3_WEnFTKr0D3uaTGjIxr9RXVJ_TVrf38zJMfpv2svq4LKg",
+			"type": "string"
+		},
+		{
+			"id": "f3e30178-06be-40b7-9316-b4330367d509",
+			"key": "api_id",
+			"value": "uey3zl75h9",
+			"type": "string"
+		},
+		{
+			"id": "171f6ea5-07f0-4383-a426-b5e1d15c2c4d",
+			"key": "contact_id_update",
+			"value": "30e0c1b7-b0b2-4b10-87b7-3501a2d88c5f",
+			"type": "string"
+		},
+		{
+			"id": "a6423b0b-6749-4d92-8b8a-c14a6c711941",
+			"key": "contact_id_delete",
+			"value": "c82ae281-7d5e-4333-9b11-7b7cd56c719b",
+			"type": "string"
+		}
+	],
+	"protocolProfileBehavior": {}
+}
